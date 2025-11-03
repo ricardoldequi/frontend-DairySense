@@ -1,0 +1,106 @@
+.top-header {
+  position: fixed;
+  top: 0;
+  left: 250px;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(90deg, #e9eef4 0%, #dedede 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  transition: left 0.3s ease;
+}
+
+.top-header.collapsed {
+  left: 70px;
+}
+
+.top-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 1rem;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0b7bfb;
+  line-height: 1.2;
+}
+
+.header-subtitle {
+  font-size: 0.85rem;
+  color: #0b7bfb;
+  font-weight: 500;
+}
+
+.header-branding {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #0b7bfb;
+}
+
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.brand-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .top-header {
+    left: 70px;
+    padding: 0 1.25rem;
+  }
+
+  .header-title {
+    font-size: 1.25rem;
+  }
+
+  .header-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .brand-name {
+    display: none;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-header {
+    left: 60px;
+    padding: 0 1rem;
+  }
+
+  .header-title {
+    font-size: 1.1rem;
+  }
+
+  .brand-icon {
+    font-size: 1.25rem;
+  }
+}
