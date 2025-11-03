@@ -1,0 +1,281 @@
+/* Mantém indentação com a Navbar (igual ao Dashboard) */
+.animals-container {
+  min-height: 100vh;
+  background: #e3f2fd;
+  margin-left: 250px;
+  margin-top: 60px; /* espaço para o header */
+  transition: margin-left 0.3s ease;
+  position: relative;
+}
+
+.animals-container.collapsed {
+  margin-left: 70px;
+}
+
+.animals-content {
+  position: relative;
+  z-index: 1;
+  padding: 1rem 2rem 2rem 2rem; /* reduz padding-top de 2rem para 1rem */
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* Remove page-header duplicado */
+.page-header {
+  display: none;
+}
+
+.page-header h1 {
+  display: none;
+}
+
+/* Ajusta page-header para só conter o botão */
+.page-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1.5rem;
+}
+
+/* Novo container para ações */
+.page-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  padding-top: 0;
+}
+
+.page-actions .btn {
+  margin-top: 1rem;
+}
+
+/* Card padrão (combina com Dashboard) */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.12);
+}
+
+/* Tabela responsiva */
+.table-wrapper {
+  width: 100%;
+  overflow: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: 0.75rem 0.75rem;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+  white-space: nowrap;
+  color: #333;
+}
+
+.table thead th {
+  color: #1565c0;
+  font-weight: 700;
+  background: rgba(21, 101, 192, 0.06);
+}
+
+.col-actions {
+  text-align: right;
+}
+
+/* Empty state */
+.empty {
+  padding: 1rem 0.5rem;
+  color: #456;
+}
+
+.empty .btn.linklike {
+  margin-left: 0.5rem;
+  color: #1565c0;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* Banner de erro */
+.banner.error {
+  background: #fee;
+  color: #c0392b;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #e74c3c;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Botões com animação (igual Navbar/Dashboard feel) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  height: 40px;
+  padding: 0 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: transform 180ms ease, background-color 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+  transform: scale(1);
+}
+
+.btn.primary {
+  background: #004aad;
+  color: #fff;
+}
+
+.btn.primary:hover,
+.btn.primary:focus-visible {
+  transform: scale(1.03);
+  background: #003a8c;
+  box-shadow: 0 6px 16px rgba(0, 58, 140, 0.25);
+}
+
+.btn.ghost {
+  background: rgba(21, 101, 192, 0.08);
+  color: #0d47a1;
+}
+
+.btn.ghost:hover,
+.btn.ghost:focus-visible {
+  transform: scale(1.03);
+  background: rgba(21, 101, 192, 0.16);
+}
+
+.btn.danger {
+  background: rgba(231, 76, 60, 0.15);
+  color: #c0392b;
+}
+
+.btn.danger:hover,
+.btn.danger:focus-visible {
+  transform: scale(1.03);
+  background: rgba(231, 76, 60, 0.25);
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  background: rgba(0,0,0,0.06);
+  transform: scale(1.05);
+}
+
+/* Modal acessível */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: grid;
+  place-items: center;
+  z-index: 1200;
+  padding: 1rem;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 560px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem 0.5rem 1rem;
+}
+
+.form {
+  padding: 0.5rem 1rem 1rem 1rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-row label {
+  font-weight: 600;
+  color: #333;
+}
+
+.form-row input,
+.form-row select {
+  padding: 0.7rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  outline: none;
+  border-color: #004aad;
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.15);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #456;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .animals-container { 
+    margin-left: 70px !important; 
+  }
+  .animals-content { 
+    padding: 0.75rem 1.25rem 1.25rem 1.25rem;
+  }
+  .form-grid { 
+    grid-template-columns: 1fr; 
+  }
+}
+
+@media (max-width: 480px) {
+  .animals-container { 
+    margin-left: 60px !important; 
+  }
+  .animals-content { 
+    padding: 0.5rem 1rem 1rem 1rem;
+  }
+}

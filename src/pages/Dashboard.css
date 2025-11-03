@@ -2,6 +2,7 @@
   min-height: 100vh;
   background: #025e9fb0; /* azul claro */
   margin-left: 250px;
+  margin-top: 60px; /* espaço para o header */
   transition: margin-left 0.3s ease;
   padding: 0;
   position: relative;
@@ -10,12 +11,12 @@
 .dashboard-container::after {
   content: '';
   position: fixed;
-  top: 0;
+  top: 60px; /* começa abaixo do header */
   left: 250px;
   right: 0;
   bottom: 0;
   width: calc(100vw - 250px);
-  height: 100vh;
+  height: calc(100vh - 60px); /* altura menos o header */
   background-image: var(--cow-bg, none);
   background-size: cover;
   background-repeat: no-repeat;
@@ -44,10 +45,9 @@
   box-sizing: border-box;
 }
 
+/* Remove h1 pois agora está no Header */
 .dashboard-content h1 {
-  margin-bottom: 2rem;
-  color: #f4f6f7; /* azul escuro para contraste */
-  font-size: 2rem;
+  display: none;
 }
 
 .loading {
@@ -97,6 +97,12 @@
   background: #e3f2fd; /* azul claro */
   border-radius: 12px;
   flex-shrink: 0;
+  color: #1565c0; /* cor dos ícones */
+}
+
+.stat-icon svg {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .stat-info {
@@ -116,7 +122,7 @@
   margin: 0;
   font-size: 2rem;
   font-weight: 700;
-  color: #1565c0; /* azul escuro */
+  color: #0b7bfb; /* azul escuro */
 }
 
 /* Responsivo */
@@ -126,17 +132,15 @@
   }
 
   .dashboard-container::after {
+    top: 60px;
     left: 70px;
     width: calc(100vw - 70px);
-    opacity: 0.02;
+    height: calc(100vh - 60px);
+    opacity: 0.15;
   }
 
   .dashboard-content {
     padding: 1.5rem;
-  }
-
-  .dashboard-content h1 {
-    font-size: 1.5rem;
   }
 
   .stats-grid {
@@ -165,18 +169,15 @@
   }
 
   .dashboard-container::after {
+    top: 60px;
     left: 60px;
     width: calc(100vw - 60px);
-    opacity: 0.02;
+    height: calc(100vh - 60px);
+    opacity: 0.15;
   }
 
   .dashboard-content {
     padding: 1rem;
-  }
-
-  .dashboard-content h1 {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
   }
 
   .stat-card {

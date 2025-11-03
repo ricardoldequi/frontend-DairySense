@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+import Header from '../components/Header';
 import cowBg from '../assets/background.jpg';
 import './Dashboard.css';
 
-
+// Importar ícones
+import { GiCow } from 'react-icons/gi'; // vaca
+import { HiMiniSignal } from "react-icons/hi2"; // colar/dispositivo
+import { IoStatsChart } from 'react-icons/io5'; // estatísticas
+import { IoWarning } from 'react-icons/io5'; // alerta
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -43,21 +48,23 @@ function Dashboard() {
   return (
     <>
       <Navbar onToggle={setIsNavbarCollapsed} />
+      <Header 
+        title="Dashboard" 
+        isCollapsed={isNavbarCollapsed}
+      />
       <div 
         className={`dashboard-container ${isNavbarCollapsed ? 'collapsed' : ''}`}
-        style={{
-          '--cow-bg': `url(${cowBg})`
-        }}
+        style={{ '--cow-bg': `url(${cowBg})` }}
       >
         <div className="dashboard-content">
-          <h1>Dashboard</h1>
-          
           {loading ? (
             <div className="loading">Carregando...</div>
           ) : (
             <div className="stats-grid">
               <div className="stat-card">
-                <div className="stat-icon">📡</div>
+                <div className="stat-icon">
+                  <HiMiniSignal />
+                </div>
                 <div className="stat-info">
                   <h3>Colares Ativos</h3>
                   <p className="stat-number">{stats.activeCollars}</p>
@@ -65,7 +72,9 @@ function Dashboard() {
               </div>
 
               <div className="stat-card">
-                <div className="stat-icon">🐄</div>
+                <div className="stat-icon">
+                  <GiCow />
+                </div>
                 <div className="stat-info">
                   <h3>Total de Animais</h3>
                   <p className="stat-number">{stats.totalAnimals}</p>
@@ -73,7 +82,9 @@ function Dashboard() {
               </div>
 
               <div className="stat-card">
-                <div className="stat-icon">📊</div>
+                <div className="stat-icon">
+                  <IoStatsChart />
+                </div>
                 <div className="stat-info">
                   <h3>Leituras Hoje</h3>
                   <p className="stat-number">{stats.todayReadings}</p>
@@ -81,7 +92,9 @@ function Dashboard() {
               </div>
 
               <div className="stat-card alert">
-                <div className="stat-icon">⚠️</div>
+                <div className="stat-icon">
+                  <IoWarning />
+                </div>
                 <div className="stat-info">
                   <h3>Alertas Ativos</h3>
                   <p className="stat-number">{stats.alerts}</p>
