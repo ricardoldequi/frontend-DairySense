@@ -7,7 +7,9 @@ import { RiAlertFill } from "react-icons/ri";
 import { GiMovementSensor } from "react-icons/gi";
 import { GiExitDoor } from "react-icons/gi";
 import { MdSensors } from "react-icons/md";
-import './Navbar.css?v=4';
+import { FaUsers } from "react-icons/fa";
+import { MdMonitorHeart } from "react-icons/md";
+import './Navbar.css?v=5';
 
 function Navbar({ onToggle }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -56,6 +58,10 @@ function Navbar({ onToggle }) {
             <span className="icon"><MdSensors /></span>
             <span className="label">Dispositivos</span>
           </Link>
+          <Link to="/device-animals">
+            <span className="icon"><MdMonitorHeart /></span>
+            <span className="label">Monitoramento</span>
+          </Link>
           <Link to="/readings">
             <span className="icon"><GiMovementSensor /></span>
             <span className="label">Leituras</span>
@@ -63,6 +69,10 @@ function Navbar({ onToggle }) {
           <Link to="/alerts">
             <span className="icon"><RiAlertFill /></span>
             <span className="label">Alertas</span>
+          </Link>
+          <Link to="/users">
+            <span className="icon"><FaUsers /></span>
+            <span className="label">Usuários</span>
           </Link>
         </div>
 
