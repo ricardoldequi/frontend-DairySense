@@ -3,7 +3,7 @@
   min-height: 100vh;
   background: #e3f2fd;
   margin-left: 250px;
-  margin-top: 60px; /* espaço para o header */
+  margin-top: 60px;
   transition: margin-left 0.3s ease;
   position: relative;
 }
@@ -15,7 +15,7 @@
 .animals-content {
   position: relative;
   z-index: 1;
-  padding: 1rem 2rem 2rem 2rem; /* reduz padding-top de 2rem para 1rem */
+  padding: 1rem 2rem 2rem 2rem;
   max-width: 1200px;
   margin: 0 auto;
   box-sizing: border-box;
@@ -30,13 +30,6 @@
   display: none;
 }
 
-/* Ajusta page-header para só conter o botão */
-.page-header {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1.5rem;
-}
-
 /* Novo container para ações */
 .page-actions {
   display: flex;
@@ -44,18 +37,74 @@
   margin-top: 0;
   margin-bottom: 1.5rem;
   padding-top: 0;
+  position: relative; /* permite posicionamento absoluto dos banners */
+  min-height: 40px; /* garante altura mínima */
 }
 
 .page-actions .btn {
-  margin-top: 1rem;
+  margin-top: 0;
+  z-index: 2; /* botão acima do banner */
+  position: relative;
 }
 
-/* Card padrão (combina com Dashboard) */
-.card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1rem;
-  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.12);
+/* Banner dentro de page-actions (sobreposto) */
+.page-actions .banner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 120px; /* espaço para o botão */
+  z-index: 1;
+  margin: 0;
+}
+
+.page-actions .banner.error {
+  background: #fee;
+  color: #c0392b;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #e74c3c;
+  border-radius: 8px;
+  animation: slideDown 0.3s ease;
+}
+
+.page-actions .banner.success {
+  background: #d4edda;
+  color: #155724;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #28a745;
+  border-radius: 8px;
+  animation: slideDown 0.3s ease;
+}
+
+/* Banner fora de page-actions (fallback) */
+.banner.error {
+  background: #fee;
+  color: #c0392b;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #e74c3c;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  animation: slideDown 0.3s ease;
+}
+
+.banner.success {
+  background: #d4edda;
+  color: #155724;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid #28a745;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Tabela responsiva */
@@ -84,8 +133,27 @@
   background: rgba(21, 101, 192, 0.06);
 }
 
+.table tbody tr {
+  transition: background-color 180ms ease;
+}
+
+.table tbody tr:nth-child(odd) {
+  background: #fff; /* branco */
+}
+
+.table tbody tr:nth-child(even) {
+  background: #f8f9fa; /* cinza claro */
+}
+
+.table tbody tr:hover {
+  background: rgba(21, 101, 192, 0.08); /* azul claro no hover */
+}
+
 .col-actions {
   text-align: right;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
 }
 
 /* Empty state */
@@ -104,17 +172,7 @@
   text-decoration: underline;
 }
 
-/* Banner de erro */
-.banner.error {
-  background: #fee;
-  color: #c0392b;
-  padding: 0.75rem 1rem;
-  border-left: 4px solid #e74c3c;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-}
-
-/* Botões com animação (igual Navbar/Dashboard feel) */
+/* Botões com animação */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -164,14 +222,63 @@
   background: rgba(231, 76, 60, 0.25);
 }
 
+/* Botões de ação na tabela */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: transparent;
+  transition: transform 180ms ease, background-color 180ms ease, color 180ms ease;
+  transform: scale(1);
+}
+
+.btn-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.btn-icon.edit {
+  color: #0d47a1;
+}
+
+.btn-icon.edit:hover,
+.btn-icon.edit:focus-visible {
+  background: rgba(21, 101, 192, 0.12);
+  transform: scale(1.1);
+}
+
+.btn-icon.delete {
+  color: #c0392b;
+}
+
+.btn-icon.delete:hover,
+.btn-icon.delete:focus-visible {
+  background: rgba(231, 76, 60, 0.12);
+  transform: scale(1.1);
+}
+
+.btn-icon:active {
+  transform: scale(0.95);
+}
+
 .icon-btn {
   background: transparent;
   border: none;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 180ms ease, transform 180ms ease;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #333;
 }
 
 .icon-btn:hover,
@@ -180,7 +287,7 @@
   transform: scale(1.05);
 }
 
-/* Modal acessível */
+/* Modal */
 .modal {
   position: fixed;
   inset: 0;
@@ -205,6 +312,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1rem 0.5rem 1rem;
+}
+
+.modal-header h2 {
+  color: #004aad;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
 }
 
 .form {
@@ -247,8 +361,32 @@
 .modal-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 0.5rem;
-  padding-top: 0.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+.modal-footer .btn {
+  height: 40px;
+  min-width: 100px;
+  padding: 0 1rem;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-footer .btn.ghost {
+  background: #ee6f615b;
+  color: #c01b09;
+}
+
+.modal-footer .btn.ghost:hover,
+.modal-footer .btn.ghost:focus-visible {
+  transform: scale(1.03);
+  background: rgba(231, 76, 60, 0.15);
+  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.2);
 }
 
 /* Loading */
@@ -258,7 +396,6 @@
   color: #456;
 }
 
-/* Responsivo */
 @media (max-width: 768px) {
   .animals-container { 
     margin-left: 70px !important; 
@@ -268,6 +405,19 @@
   }
   .form-grid { 
     grid-template-columns: 1fr; 
+  }
+  
+  /* Em mobile, empilha banner acima do botão */
+  .page-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    min-height: auto;
+  }
+  
+  .page-actions .banner {
+    position: static;
+    right: auto;
   }
 }
 

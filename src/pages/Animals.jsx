@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import Header from '../components/Header';
+import { MdEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
 import './Animals.css';
 
 const API_BASE = 'http://localhost:3000/api';
@@ -14,6 +16,7 @@ function Animals() {
   const [isEditing, setIsEditing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const [form, setForm] = useState({
     id: null,
@@ -21,7 +24,6 @@ function Animals() {
     breed_id: '',
     age: '',
     earring: ''
-    // user_id: '' // se o backend exigir, inclua/defina aqui
   });
 
   useEffect(() => {
@@ -66,11 +68,20 @@ function Animals() {
     fetchAll();
   }, []);
 
+  // Auto-hide success message após 3 segundos
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const openCreate = () => {
     setForm({ id: null, name: '', breed_id: '', age: '', earring: '' });
     setIsEditing(false);
     setFormOpen(true);
     setError('');
+    setSuccessMessage('');
   };
 
   const openEdit = (animal) => {
@@ -84,9 +95,19 @@ function Animals() {
     setIsEditing(true);
     setFormOpen(true);
     setError('');
+    setSuccessMessage('');
   };
 
   const closeForm = () => {
+    const hasData = form.name || form.breed_id || form.age || form.earring;
+    
+    if (hasData) {
+      const confirmClose = window.confirm('Deseja realmente cancelar o registro? Os dados não salvos serão perdidos.');
+      if (!confirmClose) return;
+      
+      setSuccessMessage('Registro cancelado com sucesso!');
+    }
+    
     setFormOpen(false);
     setSubmitting(false);
     setError('');
@@ -101,6 +122,7 @@ function Animals() {
     e.preventDefault();
     setSubmitting(true);
     setError('');
+    setSuccessMessage('');
 
     const token = localStorage.getItem('token');
     if (!token) {
@@ -115,7 +137,6 @@ function Animals() {
           breed_id: form.breed_id ? Number(form.breed_id) : null,
           age: form.age ? Number(form.age) : null,
           earring: form.earring || null,
-          // user_id: form.user_id ? Number(form.user_id) : null
         },
       };
 
@@ -140,14 +161,15 @@ function Animals() {
         );
       }
 
-      // Atualiza a lista
       if (isEditing) {
         setAnimals((prev) => prev.map((a) => (a.id === data.id ? data : a)));
+        setSuccessMessage('Registro atualizado com sucesso!');
       } else {
         setAnimals((prev) => [data, ...prev]);
+        setSuccessMessage('Registro salvo com sucesso!');
       }
 
-      closeForm();
+      setFormOpen(false);
     } catch (e) {
       console.error(e);
       setError(e.message);
@@ -174,9 +196,10 @@ function Animals() {
       if (!res.ok) throw new Error('Falha ao excluir');
 
       setAnimals((prev) => prev.filter((a) => a.id !== animal.id));
+      setSuccessMessage('Registro apagado com sucesso!');
     } catch (e) {
       console.error(e);
-      alert('Erro ao excluir. Tente novamente.');
+      setError('Erro ao excluir. Tente novamente.');
     }
   };
 
@@ -187,19 +210,20 @@ function Animals() {
     <>
       <Navbar onToggle={setIsNavbarCollapsed} />
       <Header 
-        title="Animais" 
-        subtitle="Gerenciamento do rebanho"
+        title="Rebanho" 
         isCollapsed={isNavbarCollapsed}
       />
       <div className={`animals-container ${isNavbarCollapsed ? 'collapsed' : ''}`}>
         <div className="animals-content">
           <div className="page-actions">
+            {/* Banners movidos para dentro de page-actions */}
+            {error && <div className="banner error">{error}</div>}
+            {successMessage && <div className="banner success">{successMessage}</div>}
+            
             <button className="btn primary" onClick={openCreate}>
               + Novo animal
             </button>
           </div>
-
-          {error && <div className="banner error">{error}</div>}
 
           {loading ? (
             <div className="loading">Carregando...</div>
@@ -232,14 +256,21 @@ function Animals() {
                           <td>{a.age ?? '—'}</td>
                           <td>{a.earring || '—'}</td>
                           <td className="col-actions">
-                            <button className="btn ghost" onClick={() => openEdit(a)}>
-                              Editar
+                            <button 
+                              className="btn-icon edit" 
+                              onClick={() => openEdit(a)}
+                              aria-label="Editar"
+                              title="Editar"
+                            >
+                              <MdEdit />
                             </button>
                             <button
-                              className="btn danger"
+                              className="btn-icon delete"
                               onClick={() => handleDelete(a)}
+                              aria-label="Excluir"
+                              title="Excluir"
                             >
-                              Excluir
+                              <MdDelete />
                             </button>
                           </td>
                         </tr>
@@ -258,7 +289,7 @@ function Animals() {
           <div className="modal-content">
             <div className="modal-header">
               <h2 id="animal-form-title">
-                {isEditing ? 'Editar animal' : 'Novo animal'}
+                {isEditing ? 'Editando animal' : 'Novo animal'}
               </h2>
               <button className="icon-btn" onClick={closeForm} aria-label="Fechar">✕</button>
             </div>
