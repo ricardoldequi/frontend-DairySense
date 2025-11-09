@@ -1,4 +1,4 @@
-/* Mantém indentação com a Navbar (igual ao Dashboard) */
+/* indentação com a Navbar */
 .animals-container {
   min-height: 100vh;
   background: #e3f2fd;
@@ -21,7 +21,6 @@
   box-sizing: border-box;
 }
 
-/* Remove page-header duplicado */
 .page-header {
   display: none;
 }
@@ -30,29 +29,27 @@
   display: none;
 }
 
-/* Novo container para ações */
 .page-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 0;
   margin-bottom: 1.5rem;
   padding-top: 0;
-  position: relative; /* permite posicionamento absoluto dos banners */
-  min-height: 40px; /* garante altura mínima */
+  position: relative; 
+  min-height: 40px; 
 }
 
 .page-actions .btn {
   margin-top: 0;
-  z-index: 2; /* botão acima do banner */
+  z-index: 2; 
   position: relative;
 }
 
-/* Banner dentro de page-actions (sobreposto) */
 .page-actions .banner {
   position: absolute;
   left: 0;
   top: 0;
-  right: 120px; /* espaço para o botão */
+  right: 120px; 
   z-index: 1;
   margin: 0;
 }
@@ -75,7 +72,6 @@
   animation: slideDown 0.3s ease;
 }
 
-/* Banner fora de page-actions (fallback) */
 .banner.error {
   background: #fee;
   color: #c0392b;
@@ -107,7 +103,6 @@
   }
 }
 
-/* Tabela responsiva */
 .table-wrapper {
   width: 100%;
   overflow: auto;
@@ -138,15 +133,15 @@
 }
 
 .table tbody tr:nth-child(odd) {
-  background: #fff; /* branco */
+  background: #fff; 
 }
 
 .table tbody tr:nth-child(even) {
-  background: #f8f9fa; /* cinza claro */
+  background: #f8f9fa; 
 }
 
 .table tbody tr:hover {
-  background: rgba(21, 101, 192, 0.08); /* azul claro no hover */
+  background: rgba(21, 101, 192, 0.08); 
 }
 
 .col-actions {
@@ -156,7 +151,6 @@
   justify-content: flex-end;
 }
 
-/* Empty state */
 .empty {
   padding: 1rem 0.5rem;
   color: #456;
@@ -172,7 +166,6 @@
   text-decoration: underline;
 }
 
-/* Botões com animação */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -222,7 +215,6 @@
   background: rgba(231, 76, 60, 0.25);
 }
 
-/* Botões de ação na tabela */
 .btn-icon {
   display: inline-flex;
   align-items: center;
@@ -287,7 +279,6 @@
   transform: scale(1.05);
 }
 
-/* Modal */
 .modal {
   position: fixed;
   inset: 0;
@@ -407,7 +398,7 @@
     grid-template-columns: 1fr; 
   }
   
-  /* Em mobile, empilha banner acima do botão */
+  /* empilha banner acima do botao (mobile) */
   .page-actions {
     flex-direction: column;
     align-items: stretch;

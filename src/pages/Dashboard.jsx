@@ -4,11 +4,10 @@ import Header from '../components/Header';
 import cowBg from '../assets/background.jpg';
 import './Dashboard.css';
 
-// Importar ícones
-import { GiCow } from 'react-icons/gi'; // vaca
-import { HiMiniSignal } from "react-icons/hi2"; // colar/dispositivo
-import { IoStatsChart } from 'react-icons/io5'; // estatísticas
-import { IoWarning } from 'react-icons/io5'; // alerta
+import { GiCow } from 'react-icons/gi'; 
+import { HiMiniSignal } from "react-icons/hi2"; 
+import { IoStatsChart } from 'react-icons/io5'; 
+import { IoWarning } from 'react-icons/io5'; 
 
 function Dashboard() {
   const [stats, setStats] = useState({

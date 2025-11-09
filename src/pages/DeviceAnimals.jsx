@@ -74,7 +74,6 @@ function DeviceAnimals() {
     fetchAll();
   }, []);
 
-  // Auto-hide success message após 3 segundos
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(''), 3000);
@@ -82,7 +81,7 @@ function DeviceAnimals() {
     }
   }, [successMessage]);
 
-  // Valida conflito de datas para animal ou device
+  // conflito de datas para animal ou device
   const hasDateConflict = (resourceId, resourceType, startDate, endDate, excludeId = null) => {
     if (!startDate) return false;
 
@@ -90,10 +89,8 @@ function DeviceAnimals() {
     const end = endDate ? new Date(endDate) : null;
 
     return deviceAnimals.some((da) => {
-      // Ignora o registro atual ao editar
       if (excludeId && da.id === excludeId) return false;
 
-      // Verifica se é o mesmo animal ou device
       const isSameResource = resourceType === 'animal' 
         ? da.animal_id === Number(resourceId)
         : da.device_id === Number(resourceId);
@@ -103,28 +100,20 @@ function DeviceAnimals() {
       const existingStart = new Date(da.start_date);
       const existingEnd = da.end_date ? new Date(da.end_date) : null;
 
-      // Caso 1: Período existente sem data fim (ativo indefinidamente)
       if (!existingEnd) {
-        // Novo período sem fim: sempre conflita
         if (!end) return true;
-        // Novo período termina após início do existente: conflita
         if (end >= existingStart) return true;
         return false;
       }
 
-      // Caso 2: Novo período sem data fim
       if (!end) {
-        // Conflita se começa antes do fim do período existente
         return start <= existingEnd;
       }
 
-      // Caso 3: Ambos têm início e fim - verifica sobreposição
-      // Períodos se sobrepõem se: início1 <= fim2 E início2 <= fim1
       return start <= existingEnd && existingStart <= end;
     });
   };
 
-  // Filtra animais disponíveis (sem conflito de data)
   const getAvailableAnimals = () => {
     if (!form.start_date) return animals;
 
@@ -133,7 +122,6 @@ function DeviceAnimals() {
     );
   };
 
-  // Filtra devices disponíveis (sem conflito de data)
   const getAvailableDevices = () => {
     if (!form.start_date) return devices;
 
@@ -184,13 +172,10 @@ function DeviceAnimals() {
     setForm((f) => {
       const newForm = { ...f, [name]: value };
 
-      // Se mudou a data, verifica se animal/device ainda são válidos
       if (name === 'start_date' || name === 'end_date') {
-        // Limpa animal se houver conflito
         if (newForm.animal_id && hasDateConflict(newForm.animal_id, 'animal', newForm.start_date, newForm.end_date, newForm.id)) {
           newForm.animal_id = '';
         }
-        // Limpa device se houver conflito
         if (newForm.device_id && hasDateConflict(newForm.device_id, 'device', newForm.start_date, newForm.end_date, newForm.id)) {
           newForm.device_id = '';
         }
@@ -206,7 +191,6 @@ function DeviceAnimals() {
     setError('');
     setSuccessMessage('');
 
-    // Validação adicional antes de enviar
     if (hasDateConflict(form.animal_id, 'animal', form.start_date, form.end_date, form.id)) {
       setError('Este animal já está sendo monitorado nesta data. Por favor, revise os cadastros.');
       setSubmitting(false);
@@ -317,7 +301,6 @@ function DeviceAnimals() {
   const availableAnimals = getAvailableAnimals();
   const availableDevices = getAvailableDevices();
 
-  // Formata opções para o CustomSelect
   const animalOptions = availableAnimals.map(a => ({
     value: a.id,
     label: a.name

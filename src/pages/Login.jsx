@@ -48,8 +48,8 @@ function Login() {
         setErrorMessage(data.error || 'Credenciais inválidas.');
       }
     } catch (error) {
-      console.error('Erro ao conectar:', error);
-      setErrorMessage('Erro ao conectar à API. Verifique sua conexão.');
+      console.error('Erro ao se conectar:', error);
+      setErrorMessage('Erro ao se conectar. Verifique sua conexão.');
     } finally {
       setLoading(false);
     }

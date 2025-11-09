@@ -4,6 +4,7 @@ import Header from '../components/Header';
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { MdContentCopy } from "react-icons/md";
+import { LuOctagonAlert } from "react-icons/lu";
 import './Devices.css';
 
 const API_BASE = 'http://localhost:3000/api';
@@ -60,7 +61,6 @@ function Devices() {
     fetchDevices();
   }, []);
 
-  // Auto-hide success message após 3 segundos
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(''), 3000);
@@ -158,7 +158,6 @@ function Devices() {
         setSuccessMessage('Registro atualizado com sucesso!');
         setFormOpen(false);
       } else {
-        // Criação: mostra API Key
         setDevices((prev) => [data, ...prev]);
         setNewApiKey(data.api_key);
         setShowApiKey(true);
@@ -300,7 +299,8 @@ function Devices() {
             {showApiKey ? (
               <div className="form api-key-display">
                 <p className="api-key-info">
-                  ⚠️ Copie a API Key abaixo. Ela não será exibida novamente!
+                  <LuOctagonAlert className="alert-icon" />
+                  Copie a API Key abaixo. Ela não será exibida novamente!
                 </p>
                 <div className="api-key-container">
                   <code className="api-key-code">{newApiKey}</code>

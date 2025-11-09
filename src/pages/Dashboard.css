@@ -122,10 +122,9 @@
   margin: 0;
   font-size: 2rem;
   font-weight: 700;
-  color: #0b7bfb; /* azul escuro */
+  color: #0b7bfb;
 }
 
-/* Responsivo */
 @media (max-width: 768px) {
   .dashboard-container {
     margin-left: 70px !important;
