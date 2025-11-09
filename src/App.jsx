@@ -7,6 +7,7 @@ import Devices from './pages/Devices';
 import DeviceAnimals from './pages/DeviceAnimals';
 import Users from './pages/Users';
 import Readings from './pages/Readings';
+import Baselines from './pages/Baselines';
 
 function ProtectedRoute({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -82,6 +83,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Readings />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/baselines" 
+          element={
+            <ProtectedRoute>
+              <Baselines />
             </ProtectedRoute>
           } 
         />

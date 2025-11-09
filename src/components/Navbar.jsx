@@ -9,6 +9,7 @@ import { GiExitDoor } from "react-icons/gi";
 import { MdSensors } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
 import { MdMonitorHeart } from "react-icons/md";
+import { MdBlurLinear } from "react-icons/md";
 import './Navbar.css?v=5';
 
 function Navbar({ onToggle }) {
@@ -73,6 +74,10 @@ function Navbar({ onToggle }) {
           <Link to="/users">
             <span className="icon"><FaUsers /></span>
             <span className="label">Usuários</span>
+          </Link>
+            <Link to="/baselines">
+            <span className="icon"><MdBlurLinear /></span>
+            <span className="label">Baselines</span>
           </Link>
         </div>
 
