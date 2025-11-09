@@ -16,7 +16,9 @@ function CustomSelect({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const dropdownRef = useRef(null);
+  const selectRef = useRef(null);
 
   const selectedOption = options.find(opt => String(opt.value) === String(value));
   const displayText = selectedOption ? selectedOption.label : placeholder;
@@ -25,10 +27,23 @@ function CustomSelect({
     opt.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Fecha dropdown ao clicar fora
+  // calcula posição do dropdown
+  useEffect(() => {
+    if (isOpen && selectRef.current) {
+      const rect = selectRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width
+      });
+    }
+  }, [isOpen]);
+
+  // fecha dropdown ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+          selectRef.current && !selectRef.current.contains(event.target)) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -40,6 +55,30 @@ function CustomSelect({
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
+
+  // reposiciona dropdown ao redimensionar janela
+  useEffect(() => {
+    const handleResize = () => {
+      if (isOpen && selectRef.current) {
+        const rect = selectRef.current.getBoundingClientRect();
+        setDropdownPosition({
+          top: rect.bottom + 4,
+          left: rect.left,
+          width: rect.width
+        });
+      }
+    };
+
+    if (isOpen) {
+      window.addEventListener('resize', handleResize);
+      window.addEventListener('scroll', handleResize, true);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleResize, true);
     };
   }, [isOpen]);
 
@@ -57,35 +96,46 @@ function CustomSelect({
   };
 
   return (
-    <div className="custom-select-wrapper" ref={dropdownRef}>
-      {label && (
-        <label htmlFor={id} className="custom-select-label">
-          {label} {required && '*'}
-          {hint && <span className="custom-select-hint">{hint}</span>}
-        </label>
-      )}
-      
-      <div 
-        className={`custom-select ${isOpen ? 'open' : ''} ${disabled ? 'disabled' : ''}`}
-        onClick={handleToggle}
-      >
-        <input
-          type="hidden"
-          id={id}
-          name={name}
-          value={value}
-          required={required}
-        />
-        <div className="custom-select-display">
-          <span className={!selectedOption ? 'placeholder' : ''}>
-            {displayText}
-          </span>
-          <MdExpandMore className="custom-select-arrow" />
+    <>
+      <div className="custom-select-wrapper">
+        {label && (
+          <label htmlFor={id} className="custom-select-label">
+            {label} {required && '*'}
+            {hint && <span className="custom-select-hint">{hint}</span>}
+          </label>
+        )}
+        
+        <div 
+          ref={selectRef}
+          className={`custom-select ${isOpen ? 'open' : ''} ${disabled ? 'disabled' : ''}`}
+          onClick={handleToggle}
+        >
+          <input
+            type="hidden"
+            id={id}
+            name={name}
+            value={value}
+            required={required}
+          />
+          <div className="custom-select-display">
+            <span className={!selectedOption ? 'placeholder' : ''}>
+              {displayText}
+            </span>
+            <MdExpandMore className="custom-select-arrow" />
+          </div>
         </div>
       </div>
 
       {isOpen && (
-        <div className="custom-select-dropdown">
+        <div 
+          ref={dropdownRef}
+          className="custom-select-dropdown"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`
+          }}
+        >
           <div className="custom-select-search">
             <input
               type="text"
@@ -115,7 +165,7 @@ function CustomSelect({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
 

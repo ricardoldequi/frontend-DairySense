@@ -7,20 +7,22 @@
   display: block;
   font-weight: 600;
   color: #333;
-  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
 }
 
 .custom-select-hint {
-  font-size: 0.875rem;
-  color: #c0392b;
-  margin-left: 0.5rem;
+  display: block;
   font-weight: 400;
+  color: #666;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
 }
 
 .custom-select {
   position: relative;
   width: 100%;
-  padding: 0.7rem;
+  padding: 0.75rem;
   border: 1px solid #ddd;
   border-radius: 8px;
   background-color: #fff;
@@ -30,7 +32,7 @@
 }
 
 .custom-select:hover {
-  border-color: #aaa;
+  border-color: #004aad;
 }
 
 .custom-select.open {
@@ -42,13 +44,13 @@
   background-color: #f5f5f5;
   color: #999;
   cursor: not-allowed;
-  opacity: 0.6;
+  pointer-events: none;
 }
 
 .custom-select-display {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   gap: 0.5rem;
 }
 
@@ -56,10 +58,18 @@
   color: #999;
 }
 
+.custom-select-display span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #333;
+  font-size: 1rem;
+}
+
 .custom-select-arrow {
   flex-shrink: 0;
-  width: 1.25rem;
-  height: 1.25rem;
+  font-size: 1.5rem;
   color: #666;
   transition: transform 0.2s ease;
 }
@@ -69,25 +79,21 @@
 }
 
 .custom-select-dropdown {
-  position: absolute;
-  top: calc(100% + 0.25rem);
-  left: 0;
-  right: 0;
+  position: fixed;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-  max-height: 280px;
-  display: flex;
-  flex-direction: column;
+  max-height: 300px;
+  overflow: hidden;
+  z-index: 9999 !important;
   animation: slideDown 0.2s ease;
 }
 
 @keyframes slideDown {
   from {
     opacity: 0;
-    transform: translateY(-8px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -98,6 +104,10 @@
 .custom-select-search {
   padding: 0.5rem;
   border-bottom: 1px solid #eee;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 10;
 }
 
 .custom-select-search input {
@@ -107,6 +117,7 @@
   border-radius: 6px;
   font-size: 0.9rem;
   outline: none;
+  transition: border-color 0.2s ease;
 }
 
 .custom-select-search input:focus {
@@ -115,8 +126,26 @@
 }
 
 .custom-select-options {
+  max-height: 240px;
   overflow-y: auto;
-  max-height: 200px;
+}
+
+.custom-select-options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-select-options::-webkit-scrollbar-track {
+  background: #f5f5f5;
+  border-radius: 4px;
+}
+
+.custom-select-options::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.custom-select-options::-webkit-scrollbar-thumb:hover {
+  background: #999;
 }
 
 .custom-select-option {
@@ -124,69 +153,26 @@
   cursor: pointer;
   transition: background-color 0.15s ease;
   font-size: 0.95rem;
+  color: #333;
 }
 
 .custom-select-option:hover {
-  background-color: rgba(21, 101, 192, 0.08);
+  background-color: #f0f7ff;
 }
 
 .custom-select-option.selected {
-  background-color: rgba(21, 101, 192, 0.12);
+  background-color: #e3f2fd;
   color: #004aad;
   font-weight: 600;
 }
 
 .custom-select-option.empty {
   color: #999;
-  cursor: default;
   text-align: center;
-  padding: 1rem;
+  cursor: default;
+  font-style: italic;
 }
 
 .custom-select-option.empty:hover {
   background-color: transparent;
-}
-
-/* Scrollbar customizada */
-.custom-select-options::-webkit-scrollbar {
-  width: 6px;
-}
-
-.custom-select-options::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 8px;
-}
-
-.custom-select-options::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 8px;
-}
-
-.custom-select-options::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
-
-/* Responsivo */
-@media (max-width: 768px) {
-  .custom-select-dropdown {
-    max-height: 240px;
-  }
-  
-  .custom-select-options {
-    max-height: 180px;
-  }
-  
-  .custom-select-option {
-    padding: 0.65rem 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .custom-select-dropdown {
-    max-height: 200px;
-  }
-  
-  .custom-select-options {
-    max-height: 150px;
-  }
 }
