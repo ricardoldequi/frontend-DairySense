@@ -218,7 +218,6 @@ function Users() {
       <Navbar onToggle={setIsNavbarCollapsed} />
       <Header 
         title="Usuários" 
-        subtitle="Gerenciamento de usuários"
         isCollapsed={isNavbarCollapsed}
       />
       <div className={`users-container ${isNavbarCollapsed ? 'collapsed' : ''}`}>

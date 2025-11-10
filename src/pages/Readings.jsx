@@ -654,7 +654,6 @@ function Readings() {
       <Navbar onToggle={setIsNavbarCollapsed} />
       <Header 
         title="Análise de Atividade" 
-        subtitle="Monitoramento comportamental com baseline"
         isCollapsed={isNavbarCollapsed}
       />
       <div className={`readings-container ${isNavbarCollapsed ? 'collapsed' : ''}`}>

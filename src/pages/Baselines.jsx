@@ -617,7 +617,6 @@ function Baselines() {
       <Navbar onToggle={setIsNavbarCollapsed} />
       <Header 
         title="Criar Baseline de Atividade" 
-        subtitle="Selecione o período de comportamento normal para o animal"
         isCollapsed={isNavbarCollapsed}
       />
       <div className={`baselines-container ${isNavbarCollapsed ? 'collapsed' : ''}`}>

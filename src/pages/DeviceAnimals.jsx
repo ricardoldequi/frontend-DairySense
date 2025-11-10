@@ -316,7 +316,6 @@ function DeviceAnimals() {
       <Navbar onToggle={setIsNavbarCollapsed} />
       <Header 
         title="Animais Monitorados" 
-        subtitle="Associação de dispositivos aos animais"
         isCollapsed={isNavbarCollapsed}
       />
       <div className={`device-animals-container ${isNavbarCollapsed ? 'collapsed' : ''}`}>
