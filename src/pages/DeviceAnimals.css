@@ -109,6 +109,25 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  position: relative;
+}
+
+.table thead {
+  position: relative;
+  z-index: 0;
+}
+
+.table thead th {
+  color: #fff !important;
+  font-weight: 700;
+  background: rgba(21, 101, 192, 0.06);
+  position: relative;
+  z-index: 0;
+}
+
+.table tbody {
+  position: relative;
+  z-index: 1;
 }
 
 .table th,
@@ -120,14 +139,9 @@
   color: #333;
 }
 
-.table thead th {
-  color: #1565c0;
-  font-weight: 700;
-  background: rgba(21, 101, 192, 0.06);
-}
-
 .table tbody tr {
   transition: background-color 180ms ease;
+  position: relative;
 }
 
 .table tbody tr:nth-child(odd) {
@@ -147,8 +161,9 @@
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
+  position: relative;
+  z-index: 2;
 }
-
 
 .empty {
   padding: 1rem 0.5rem;

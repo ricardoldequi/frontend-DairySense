@@ -363,7 +363,7 @@ function Readings() {
           fill: false
         },
         {
-          label: 'Limiar de Alerta (Baseline + 3*MAD)',
+          label: 'Limiar de Alerta',
           data: readings.map(() => upperLimit),
           borderColor: 'rgb(244, 67, 54)',
           backgroundColor: 'rgba(244, 67, 54, 0.05)',
