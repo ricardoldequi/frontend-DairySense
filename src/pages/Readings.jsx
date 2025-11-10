@@ -363,7 +363,7 @@ function Readings() {
           fill: false
         },
         {
-          label: 'Limiar de Alerta (Baseline + 3*MAD)',
+          label: 'Limiar de Alerta',
           data: readings.map(() => upperLimit),
           borderColor: 'rgb(244, 67, 54)',
           backgroundColor: 'rgba(244, 67, 54, 0.05)',
@@ -654,7 +654,6 @@ function Readings() {
       <Navbar onToggle={setIsNavbarCollapsed} />
       <Header 
         title="Análise de Atividade" 
-        subtitle="Monitoramento comportamental com baseline"
         isCollapsed={isNavbarCollapsed}
       />
       <div className={`readings-container ${isNavbarCollapsed ? 'collapsed' : ''}`}>

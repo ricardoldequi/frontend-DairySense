@@ -215,7 +215,6 @@ function Devices() {
       <Navbar onToggle={setIsNavbarCollapsed} />
       <Header 
         title="Dispositivos" 
-        subtitle="Gerenciamento de sensores"
         isCollapsed={isNavbarCollapsed}
       />
       <div className={`devices-container ${isNavbarCollapsed ? 'collapsed' : ''}`}>

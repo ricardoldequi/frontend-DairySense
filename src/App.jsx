@@ -8,6 +8,7 @@ import DeviceAnimals from './pages/DeviceAnimals';
 import Users from './pages/Users';
 import Readings from './pages/Readings';
 import Baselines from './pages/Baselines';
+import Alerts from './pages/Alerts';
 
 function ProtectedRoute({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -91,6 +92,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Baselines />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/alerts" 
+          element={
+            <ProtectedRoute>
+              <Alerts />
             </ProtectedRoute>
           } 
         />
