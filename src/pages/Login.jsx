@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // 👁️ ícones
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 import './Login.css';
 import logo from '../assets/DairyLogo.png';
+import { API_BASE_URL } from '../config/api'; 
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ function Login() {
   const [errorMessage, setErrorMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const API_BASE = API_BASE_URL; 
 
   const isEmailValid = email.includes('@') && email.includes('.');
   const isPasswordValid = password.length > 0;
@@ -33,7 +35,7 @@ function Login() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/users/login', {
+      const response = await fetch(`${API_BASE}/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

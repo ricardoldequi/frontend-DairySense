@@ -6,8 +6,9 @@ import { MdDelete } from "react-icons/md";
 import { MdContentCopy } from "react-icons/md";
 import { LuOctagonAlert } from "react-icons/lu";
 import './Devices.css';
+import { API_BASE_URL } from '../config/api'; 
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = API_BASE_URL; 
 
 function Devices() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(false);

@@ -6,9 +6,8 @@ import { IoWarning, IoCheckmarkCircle } from 'react-icons/io5';
 import { MdAccessTime, MdCalendarMonth, MdFilterList } from 'react-icons/md';
 import { BsHourglassSplit } from 'react-icons/bs';
 import { GiCow } from 'react-icons/gi';
+import { API_BASE_URL } from '../config/api'; 
 import './Alerts.css';
-
-const API_BASE = 'http://localhost:3000/api';
 
 function Alerts() {
   const [alerts, setAlerts] = useState([]);
@@ -31,7 +30,7 @@ function Alerts() {
   const fetchAnimals = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE}/animals`, {
+      const response = await fetch(`${API_BASE_URL}/animals`, { // Atualizar URL
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -51,7 +50,7 @@ function Alerts() {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`${API_BASE}/alerts`, {
+      const response = await fetch(`${API_BASE_URL}/alerts`, { // Atualizar URL
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -106,8 +105,8 @@ function Alerts() {
       }
 
       const url = params.toString() 
-        ? `${API_BASE}/alerts?${params}` 
-        : `${API_BASE}/alerts`;
+        ? `${API_BASE_URL}/alerts?${params}` // Atualizar URL
+        : `${API_BASE_URL}/alerts`; // Atualizar URL
 
       const response = await fetch(url, {
         headers: {

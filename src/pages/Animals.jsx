@@ -4,8 +4,9 @@ import Header from '../components/Header';
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import './Animals.css';
+import { API_BASE_URL } from '../config/api'; 
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = API_BASE_URL; 
 
 function Animals() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(false);

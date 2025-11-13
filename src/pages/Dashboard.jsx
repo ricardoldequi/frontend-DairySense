@@ -14,6 +14,7 @@ import {
   Filler
 } from 'chart.js';
 import cowBg from '../assets/background.jpg';
+import { API_BASE_URL } from '../config/api';
 import './Dashboard.css';
 
 import { GiCow } from 'react-icons/gi'; 
@@ -57,7 +58,7 @@ function Dashboard() {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/dashboard/stats', {
+      const response = await fetch(`${API_BASE_URL}/dashboard/stats`, { 
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -89,13 +90,13 @@ function Dashboard() {
       });
 
       const [alertsRes, animalsRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/alerts?${params}`, {
+        fetch(`${API_BASE_URL}/alerts?${params}`, { 
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         }),
-        fetch('http://localhost:3000/api/animals', {
+        fetch(`${API_BASE_URL}/animals`, { 
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -133,8 +134,8 @@ function Dashboard() {
       };
 
       const [animalsRes, deviceAnimalsRes] = await Promise.all([
-        fetch('http://localhost:3000/api/animals', { headers }),
-        fetch('http://localhost:3000/api/device_animals', { headers })
+        fetch(`${API_BASE_URL}/animals`, { headers }), 
+        fetch(`${API_BASE_URL}/device_animals`, { headers }) 
       ]);
 
       if (!animalsRes.ok || !deviceAnimalsRes.ok) {
@@ -164,7 +165,7 @@ function Dashboard() {
           try {
             const [readingsRes, baselinesRes] = await Promise.all([
               fetch(
-                `http://localhost:3000/api/readings?${new URLSearchParams({
+                `${API_BASE_URL}/readings?${new URLSearchParams({ 
                   animal_id: animal.id.toString(),
                   start_date: last24h.toISOString(),
                   end_date: new Date().toISOString()
@@ -172,7 +173,7 @@ function Dashboard() {
                 { headers }
               ),
               fetch(
-                `http://localhost:3000/api/animals/${animal.id}/activity_baselines/latest`,
+                `${API_BASE_URL}/animals/${animal.id}/activity_baselines/latest`, 
                 { headers }
               )
             ]);

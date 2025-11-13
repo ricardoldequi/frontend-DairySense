@@ -6,8 +6,9 @@ import { MdDelete } from "react-icons/md";
 import { MdVisibility } from "react-icons/md";
 import { MdVisibilityOff } from "react-icons/md";
 import './Users.css';
+import { API_BASE_URL } from '../config/api'; 
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = API_BASE_URL; 
 
 function Users() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(false);

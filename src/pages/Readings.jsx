@@ -24,6 +24,7 @@ import {
 } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import './Readings.css';
+import { API_BASE_URL } from '../config/api'; 
 
 ChartJS.register(
   CategoryScale,
@@ -37,7 +38,7 @@ ChartJS.register(
   annotationPlugin
 );
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = API_BASE_URL; 
 
 function Readings() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(false);

@@ -20,6 +20,7 @@ import { FiAlertOctagon } from 'react-icons/fi';
 import { IoWarningOutline, IoCheckmarkCircle } from 'react-icons/io5';
 import { BsHourglassSplit } from 'react-icons/bs';
 import './Baselines.css';
+import { API_BASE_URL } from '../config/api';
 
 ChartJS.register(
   CategoryScale,
@@ -32,7 +33,7 @@ ChartJS.register(
   Filler
 );
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = API_BASE_URL; 
 
 function Baselines() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(false);

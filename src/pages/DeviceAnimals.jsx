@@ -5,8 +5,9 @@ import CustomSelect from '../components/CustomSelect';
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import './DeviceAnimals.css';
+import { API_BASE_URL } from '../config/api'; 
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = API_BASE_URL; 
 
 function DeviceAnimals() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(false);
