@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { MdContentCopy } from "react-icons/md";
-import { LuOctagonAlert } from "react-icons/lu";
+import { MdWarning } from "react-icons/md"; 
 import './Devices.css';
 import { API_BASE_URL } from '../config/api'; 
 
@@ -299,7 +299,7 @@ function Devices() {
             {showApiKey ? (
               <div className="form api-key-display">
                 <p className="api-key-info">
-                  <LuOctagonAlert className="alert-icon" />
+                  <MdWarning className="alert-icon" /> {}
                   Copie a API Key abaixo. Ela não será exibida novamente!
                 </p>
                 <div className="api-key-container">
