@@ -9,6 +9,9 @@ COPY package*.json ./
 RUN npm install --production=false
 
 COPY . .
+
+# Forçar modo production
+ENV NODE_ENV=production
 RUN npm run build
 
 
