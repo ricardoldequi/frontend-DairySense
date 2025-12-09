@@ -190,11 +190,16 @@ function Dashboard() {
               )
             }));
 
+            const readingsWithENMO = readings.map(r => ({
+              ...r,
+              enmo: calculateENMO(r)  
+            }));
+
             return {
               animal,
-              readings: readingsWithMagnitude,
+              readings: readingsWithENMO,  
               baselines: baselines,
-              hasData: readingsWithMagnitude.length > 0,
+              hasData: readingsWithENMO.length > 0,
               hasBaseline: baselines.length > 0
             };
           } catch (error) {
@@ -246,6 +251,14 @@ function Dashboard() {
     }
   };
 
+  const calculateENMO = (reading) => {
+    const x = reading.accel_x || 0;
+    const y = reading.accel_y || 0;
+    const z = reading.accel_z || 0;
+    const magnitude = Math.sqrt(x * x + y * y + z * z);
+    return Math.max(0, magnitude - 1.0);
+  };
+
   const generateChartData = (readings, baselines) => {
     console.log('=== GENERATE CHART DATA ===');
     console.log('Readings count:', readings.length);
@@ -262,12 +275,12 @@ function Dashboard() {
       });
     });
 
-    const magnitudes = readings.map(r => r.magnitude);
+    const enmoValues = readings.map(r => r.enmo);  
 
     const datasets = [
       {
-        label: 'Atividade Real (Magnitude)',
-        data: magnitudes,
+        label: 'Atividade Real (ENMO)', 
+        data: enmoValues,  
         borderColor: 'rgb(33, 150, 243)',
         backgroundColor: 'rgba(33, 150, 243, 0.1)',
         fill: true,
@@ -411,7 +424,7 @@ function Dashboard() {
               label += ': ';
             }
             if (context.parsed.y !== null) {
-              label += context.parsed.y.toFixed(4);
+              label += context.parsed.y.toFixed(4) + ' g';  
             }
             return label;
           }
@@ -420,17 +433,10 @@ function Dashboard() {
     },
     scales: {
       y: {
-        beginAtZero: true,
         title: {
           display: true,
-          text: 'Magnitude (m/s²)',
+          text: 'ENMO (g)',
           font: { size: 11, weight: 'bold' }
-        },
-        grid: { color: 'rgba(0, 0, 0, 0.05)' },
-        ticks: {
-          callback: function(value) {
-            return value.toFixed(2);
-          }
         }
       },
       x: {

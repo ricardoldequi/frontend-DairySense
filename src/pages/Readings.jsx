@@ -59,7 +59,9 @@ function Readings() {
         end_date: ''
       },
       lastSearchedAnimal: null,
-      showBaselines: false // Novo estado para controlar exibição dos baselines
+      showBaselines: false,
+      totalReadingsOriginal: 0, // Adicionar
+      wasDecimated: false // Adicionar
     }
   ]);
 
@@ -74,11 +76,12 @@ function Readings() {
     };
   };
 
-  const calculateMagnitude = (reading) => {
+  const calculateENMO = (reading) => {
     const x = reading.accel_x || 0;
     const y = reading.accel_y || 0;
     const z = reading.accel_z || 0;
-    return Math.sqrt(x * x + y * y + z * z);
+    const magnitude = Math.sqrt(x * x + y * y + z * z);
+    return Math.max(0, magnitude - 1.0);
   };
 
   const addNewAnalysis = () => {
@@ -95,7 +98,9 @@ function Readings() {
         ...defaultDates
       },
       lastSearchedAnimal: null,
-      showBaselines: false
+      showBaselines: false,
+      totalReadingsOriginal: 0, // Adicionar
+      wasDecimated: false // Adicionar
     }]);
   };
 
@@ -130,60 +135,8 @@ function Readings() {
 
     const { filters } = analysis;
 
-    // Validações mais específicas com mensagens customizadas
-    if (!filters.animal_id && !filters.start_date && !filters.end_date) {
-      const errorMsg = 'Por favor, selecione um animal e as datas inicial e final para continuar.';
-      console.log('Erro de validação:', errorMsg);
-      setError(errorMsg);
-      setTimeout(() => setError(''), 5000);
-      return;
-    }
-
-    if (!filters.animal_id) {
-      const errorMsg = 'Por favor, selecione um animal para continuar.';
-      console.log('Erro de validação:', errorMsg);
-      setError(errorMsg);
-      setTimeout(() => setError(''), 5000);
-      return;
-    }
-
-    if (!filters.start_date && !filters.end_date) {
-      const errorMsg = 'Por favor, selecione as datas inicial e final para continuar.';
-      console.log('Erro de validação:', errorMsg);
-      setError(errorMsg);
-      setTimeout(() => setError(''), 5000);
-      return;
-    }
-
-    if (!filters.start_date) {
-      const errorMsg = 'Por favor, selecione a data inicial para continuar.';
-      console.log('Erro de validação:', errorMsg);
-      setError(errorMsg);
-      setTimeout(() => setError(''), 5000);
-      return;
-    }
-
-    if (!filters.end_date) {
-      const errorMsg = 'Por favor, selecione a data final para continuar.';
-      console.log('Erro de validação:', errorMsg);
-      setError(errorMsg);
-      setTimeout(() => setError(''), 5000);
-      return;
-    }
-
-    const start = new Date(filters.start_date);
-    const end = new Date(filters.end_date);
-    const diffTime = Math.abs(end - start);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays > 5) {
-      setError('O período máximo permitido é de 5 dias.');
-      setTimeout(() => setError(''), 5000);
-      return;
-    }
-
-    if (start > end) {
-      setError('A data inicial não pode ser maior que a data final.');
+    if (!filters.animal_id || !filters.start_date || !filters.end_date) {
+      setError('Por favor, preencha todos os campos obrigatórios.');
       setTimeout(() => setError(''), 5000);
       return;
     }
@@ -194,15 +147,10 @@ function Readings() {
       return;
     }
 
-    const currentAnimal = animals.find(a => a.id === Number(filters.animal_id));
-
-    // Atualizar estado para loading e setar o animal pesquisado
+    // Atualizar estado para mostrar loading
     setAnalyses(prevAnalyses => prevAnalyses.map(a => 
-      a.id === analysisId 
-        ? { ...a, loadingData: true, lastSearchedAnimal: currentAnimal }
-        : a
+      a.id === analysisId ? { ...a, loadingData: true } : a
     ));
-    setError('');
 
     try {
       const headers = {
@@ -210,7 +158,6 @@ function Readings() {
         'Content-Type': 'application/json',
       };
 
-      // Criar datas no horário local (sem conversão UTC)
       const startDateTime = new Date(filters.start_date + 'T00:00:00');
       const endDateTime = new Date(filters.end_date + 'T23:59:59.999');
 
@@ -220,47 +167,66 @@ function Readings() {
         end_date: endDateTime.toISOString()
       });
 
-      const readingsRes = await fetch(`${API_BASE}/readings?${readingsParams}`, { headers });
+      console.log('Fetching readings with params:', readingsParams.toString());
 
-      if (readingsRes.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = '/';
-        return;
-      }
+      const [readingsRes, baselinesRes] = await Promise.all([
+        fetch(`${API_BASE}/readings?${readingsParams}`, { headers }),
+        fetch(`${API_BASE}/animals/${filters.animal_id}/activity_baselines/latest`, { headers })
+      ]);
 
       if (!readingsRes.ok) throw new Error('Falha ao carregar leituras');
+      if (!baselinesRes.ok) throw new Error('Falha ao carregar baselines');
 
-      const readingsData = await readingsRes.json();
+      const [readingsData, baselinesData] = await Promise.all([
+        readingsRes.json(),
+        baselinesRes.json()
+      ]);
 
-      // Buscar baselines do animal
-      const baselinesRes = await fetch(`${API_BASE}/animals/${filters.animal_id}/activity_baselines`, { headers });
-      
-      let baselinesData = [];
+      console.log(`Readings recebidas: ${readingsData.length}`);
+      console.log(`Baselines recebidas: ${baselinesData.length}`);
 
-      if (baselinesRes.ok) {
-        baselinesData = await baselinesRes.json();
+      if (!Array.isArray(readingsData) || readingsData.length === 0) {
+        throw new Error('Nenhuma leitura encontrada para o período selecionado');
       }
 
-      // Atualizar apenas a análise específica, mantendo lastSearchedAnimal
+      // Armazenar o total original ANTES da decimação
+      const totalReadingsOriginal = readingsData.length;
+
+      // Otimizar para visualização se houver muitos dados
+      let processedReadings = readingsData;
+      let wasDecimated = false;
+      
+      if (readingsData.length > 5000) {
+        const step = Math.ceil(readingsData.length / 3000);
+        processedReadings = readingsData.filter((_, index) => index % step === 0);
+        wasDecimated = true;
+        console.log(`Dados decimados: ${processedReadings.length} pontos (step: ${step})`);
+      }
+
+      const currentAnimal = animals.find(a => a.id.toString() === filters.animal_id);
+
       setAnalyses(prevAnalyses => prevAnalyses.map(a => 
         a.id === analysisId 
           ? { 
               ...a, 
-              readings: Array.isArray(readingsData) ? readingsData : [],
+              readings: Array.isArray(processedReadings) ? processedReadings : [],
               baselines: Array.isArray(baselinesData) ? baselinesData : [],
               loadingData: false,
-              lastSearchedAnimal: currentAnimal
+              lastSearchedAnimal: currentAnimal,
+              totalReadingsOriginal: totalReadingsOriginal, // Adicionar o total original
+              wasDecimated: wasDecimated // Flag para indicar se foi decimado
             }
           : a
       ));
 
     } catch (e) {
-      console.error('Erro ao carregar dados:', e);
-      setError('Erro ao carregar dados. Tente novamente.');
+      console.error('Erro ao buscar dados:', e);
+      setError(e.message || 'Erro ao buscar dados. Tente novamente.');
       setTimeout(() => setError(''), 5000);
+      
       setAnalyses(prevAnalyses => prevAnalyses.map(a => 
         a.id === analysisId 
-          ? { ...a, loadingData: false }
+          ? { ...a, loadingData: false, readings: [], baselines: [], totalReadingsOriginal: 0, wasDecimated: false }
           : a
       ));
     }
@@ -306,7 +272,16 @@ function Readings() {
 
   // Renderizar cada análise
   const renderAnalysis = (analysis, index) => {
-    const { filters, readings, baselines, loadingData, lastSearchedAnimal, showBaselines } = analysis;
+    const { 
+      filters, 
+      readings, 
+      baselines, 
+      loadingData, 
+      lastSearchedAnimal, 
+      showBaselines,
+      totalReadingsOriginal, // Usar o total original
+      wasDecimated 
+    } = analysis;
     const selectedAnimal = animals.find(a => a.id === Number(filters.animal_id));
     const maxDate = new Date().toISOString().split('T')[0];
     const minEndDate = filters.start_date;
@@ -320,7 +295,7 @@ function Readings() {
       label: `${a.name}${a.earring ? ` (Brinco: ${a.earring})` : ''}`
     }));
 
-    const magnitudes = readings.map(r => calculateMagnitude(r));
+    const enmoValues = readings.map(r => calculateENMO(r));
     
     const hasBaseline = baselines.length > 0 && baselines.some(b => b.baseline_enmo && b.baseline_enmo > 0);
     
@@ -336,8 +311,8 @@ function Readings() {
     
     const datasets = [
       {
-        label: 'Atividade Real (Magnitude)',
-        data: magnitudes,
+        label: 'Atividade Real (ENMO)',
+        data: enmoValues,
         borderColor: 'rgb(33, 150, 243)',
         backgroundColor: 'rgba(33, 150, 243, 0.1)',
         tension: 0.4,
@@ -377,12 +352,7 @@ function Readings() {
     }
 
     const chartData = {
-      labels: readings.map(r => new Date(r.collected_at).toLocaleString('pt-BR', {
-        day: '2-digit',
-        month: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-      })),
+      labels: readings.map(r => new Date(r.collected_at).toLocaleTimeString()),
       datasets: datasets
     };
 
@@ -419,6 +389,12 @@ function Readings() {
                 minute: '2-digit',
                 second: '2-digit'
               });
+            },
+            label: function(context) {
+              if (context.datasetIndex === 0 && context.parsed.y !== null) {
+                return `ENMO: ${context.parsed.y.toFixed(4)} g`;  
+              }
+              return context.dataset.label + ': ' + context.parsed.y.toFixed(4) + ' g';
             }
           }
         }
@@ -428,11 +404,8 @@ function Readings() {
           beginAtZero: true,
           title: {
             display: true,
-            text: 'Magnitude da Aceleração (m/s²)',
-            font: {
-              size: 14,
-              weight: 'bold'
-            }
+            text: 'ENMO (g)',  
+            font: { size: 14, weight: 'bold' }
           },
           grid: {
             color: 'rgba(0, 0, 0, 0.05)'
@@ -577,32 +550,48 @@ function Readings() {
                   <div className="stat-info-tooltip">
                     <strong>Total de Leituras</strong>
                     <p>Número total de medições de aceleração capturadas pelos sensores no período selecionado.</p>
+                    {wasDecimated && (
+                      <p><em>Gráfico otimizado para visualização ({readings.length} pontos exibidos de {totalReadingsOriginal} totais).</em></p>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="stat-value">{readings.length}</div>
+              <div className="stat-value">
+                {totalReadingsOriginal || readings.length}
+              </div>
             </div>
             {hasBaseline && (
               <div className="stat-card">
-                <div className="stat-label">Baseline Máximo</div>
+                <div className="stat-header">
+                  <div className="stat-label">Baseline Máximo</div>
+                  <div className="stat-info-wrapper">
+                    <FaCircleInfo className="stat-info-icon" />
+                    <div className="stat-info-tooltip">
+                      <strong>Baseline Máximo</strong>
+                      <p>Valor de referência calculado a partir do padrão histórico de atividade do animal durante períodos normais (sem cio). Representa o nível típico de movimento esperado.</p>
+                      <p><em>Usado como referência para detectar desvios comportamentais indicativos de cio.</em></p>
+                    </div>
+                  </div>
+                </div>
                 <div className="stat-value">{baselineValue.toFixed(4)}</div>
               </div>
             )}
             <div className="stat-card">
               <div className="stat-header">
-                <div className="stat-label">Magnitude Média</div>
+                <div className="stat-label">ENMO Médio</div>
                 <div className="stat-info-wrapper">
                   <FaCircleInfo className="stat-info-icon" />
                   <div className="stat-info-tooltip">
-                    <strong>Magnitude Média</strong>
-                    <p>Média da intensidade total de movimento do animal no período.</p>
+                    <strong>ENMO Médio (Euclidean Norm Minus One)</strong>
+                    <p>Métrica padrão que quantifica a intensidade de movimento removendo a influência da gravidade terrestre. Valores mais altos indicam maior atividade física do animal.</p>
+                    <p><em>Fórmula: ENMO = max(0, √(x² + y² + z²) - 1g)</em></p>
                   </div>
                 </div>
               </div>
               <div className="stat-value">
-                {magnitudes.length > 0 
-                  ? (magnitudes.reduce((a, b) => a + b, 0) / magnitudes.length).toFixed(2)
-                  : '0.00'
+                {enmoValues.length > 0 
+                  ? (enmoValues.reduce((a, b) => a + b, 0) / enmoValues.length).toFixed(4)
+                  : '0.0000'
                 }
               </div>
             </div>

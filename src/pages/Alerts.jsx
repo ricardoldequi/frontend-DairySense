@@ -23,54 +23,47 @@ function Alerts() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(false);
 
   useEffect(() => {
-    fetchAnimals();
-    fetchAllAlerts();
+    loadInitialData();
   }, []);
 
-  const fetchAnimals = async () => {
+  const loadInitialData = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/animals`, { // Atualizar URL
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
 
-      if (response.ok) {
-        const data = await response.json();
-        setAnimals(data);
-      }
-    } catch (error) {
-      console.error('Erro ao carregar animais:', error);
-    }
-  };
+      const [animalsRes, alertsRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/animals`, { headers }),
+        fetch(`${API_BASE_URL}/alerts`, { headers })
+      ]);
 
-  const fetchAllAlerts = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch(`${API_BASE_URL}/alerts`, { // Atualizar URL
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        const alertsWithAnimalInfo = data.map(alert => {
-          const animal = animals.find(a => a.id === alert.animal_id);
+      if (animalsRes.ok && alertsRes.ok) {
+        const animalsData = await animalsRes.json();
+        const alertsData = await alertsRes.json();
+        
+        console.log('Animais carregados:', animalsData);
+        console.log('Alertas carregados:', alertsData);
+        
+        setAnimals(animalsData);
+        
+        const alertsWithAnimalInfo = alertsData.map(alert => {
+          const animal = animalsData.find(a => a.id === alert.animal_id);
+          console.log(`Alert animal_id: ${alert.animal_id}, Animal encontrado:`, animal);
+          
           return {
             ...alert,
             animal_name: animal?.name || 'Animal desconhecido'
           };
         });
+        
+        console.log('Alertas com info dos animais:', alertsWithAnimalInfo);
         setAlerts(alertsWithAnimalInfo);
       }
     } catch (error) {
-      console.error('Erro ao carregar alertas:', error);
-      setError('Erro ao carregar alertas. Tente novamente.');
+      console.error('Erro ao carregar dados iniciais:', error);
+      setError('Erro ao carregar dados. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -90,6 +83,11 @@ function Alerts() {
 
     try {
       const token = localStorage.getItem('token');
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+      
       const params = new URLSearchParams();
 
       if (filters.animal_id) {
@@ -105,18 +103,14 @@ function Alerts() {
       }
 
       const url = params.toString() 
-        ? `${API_BASE_URL}/alerts?${params}` // Atualizar URL
-        : `${API_BASE_URL}/alerts`; // Atualizar URL
+        ? `${API_BASE_URL}/alerts?${params}`
+        : `${API_BASE_URL}/alerts`;
 
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await fetch(url, { headers });
 
       if (response.ok) {
         const data = await response.json();
+        
         const alertsWithAnimalInfo = data.map(alert => {
           const animal = animals.find(a => a.id === alert.animal_id);
           return {
@@ -124,6 +118,7 @@ function Alerts() {
             animal_name: animal?.name || 'Animal desconhecido'
           };
         });
+        
         setAlerts(alertsWithAnimalInfo);
       } else {
         throw new Error('Erro ao buscar alertas');
@@ -144,7 +139,37 @@ function Alerts() {
       end_date: ''
     });
     setLoadingAlerts(true);
-    fetchAllAlerts().finally(() => setLoadingAlerts(false));
+    
+    const fetchAllAlerts = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_BASE_URL}/alerts`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const alertsWithAnimalInfo = data.map(alert => {
+            const animal = animals.find(a => a.id === alert.animal_id);
+            return {
+              ...alert,
+              animal_name: animal?.name || 'Animal desconhecido'
+            };
+          });
+          setAlerts(alertsWithAnimalInfo);
+        }
+      } catch (error) {
+        console.error('Erro ao recarregar alertas:', error);
+        setError('Erro ao recarregar alertas. Tente novamente.');
+      } finally {
+        setLoadingAlerts(false);
+      }
+    };
+
+    fetchAllAlerts();
   };
 
   const formatDateTime = (dateTimeString) => {

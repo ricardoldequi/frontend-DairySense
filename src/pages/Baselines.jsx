@@ -9,6 +9,7 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -18,7 +19,11 @@ import { MdCalendarMonth, MdFindInPage, MdBlurLinear, MdDelete } from 'react-ico
 import { FaCircleInfo, FaListUl } from 'react-icons/fa6';
 import { FiAlertOctagon } from 'react-icons/fi';
 import { IoWarningOutline, IoCheckmarkCircle } from 'react-icons/io5';
-import { BsHourglassSplit } from 'react-icons/bs';
+import { BsHourglassSplit, BsBarChartLine } from 'react-icons/bs';
+import { TbActivity, TbCalendarStats } from 'react-icons/tb';
+import { GoGraph } from 'react-icons/go';
+import { RxCross2, RxCheckCircled } from 'react-icons/rx';
+import { HiOutlineExclamationTriangle } from 'react-icons/hi2';
 import './Baselines.css';
 import { API_BASE_URL } from '../config/api';
 
@@ -27,13 +32,16 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
   Filler
 );
 
-const API_BASE = API_BASE_URL; 
+const API_BASE = API_BASE_URL;
+
+const MIN_READINGS_THRESHOLD = 2500;
 
 function Baselines() {
   const [isNavbarCollapsed, setIsNavbarCollapsed] = useState(false);
@@ -186,7 +194,6 @@ function Baselines() {
         throw new Error('Nenhum dado encontrado para o período selecionado.');
       }
 
-      // Calcular magnitude para cada reading
       const readingsWithMagnitude = data.map(r => ({
         ...r,
         magnitude: Math.sqrt(
@@ -429,83 +436,77 @@ function Baselines() {
   let chartOptions = null;
 
   if (previewData) {
-    const hourlyData = {};
+    const dailyData = {};
     
     previewData.readings.forEach(r => {
       const dt = new Date(r.collected_at);
-      const hourKey = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:00`;
+      const dayKey = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
       
-      if (!hourlyData[hourKey]) {
-        hourlyData[hourKey] = {
-          magnitudes: [],
+      if (!dailyData[dayKey]) {
+        dailyData[dayKey] = {
+          date: dayKey,
           count: 0,
-          timestamp: dt
+          displayDate: dt.toLocaleDateString('pt-BR', { 
+            day: '2-digit', 
+            month: '2-digit',
+            year: 'numeric'
+          }),
+          shortDisplayDate: dt.toLocaleDateString('pt-BR', { 
+            day: '2-digit', 
+            month: '2-digit'
+          })
         };
       }
       
-      hourlyData[hourKey].magnitudes.push(r.magnitude);
-      hourlyData[hourKey].count++;
+      dailyData[dayKey].count++;
     });
 
     const startDate = new Date(form.start_date + 'T00:00:00');
-    const endDate = new Date(form.end_date + 'T23:00:00');
-    const allHours = [];
+    const endDate = new Date(form.end_date + 'T00:00:00');
+    const allDays = [];
     
-    for (let dt = new Date(startDate); dt <= endDate; dt.setHours(dt.getHours() + 1)) {
-      const hourKey = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')} ${String(dt.getHours()).padStart(2, '0')}:00`;
-      allHours.push({
-        label: dt.toLocaleString('pt-BR', { 
+    for (let dt = new Date(startDate); dt <= endDate; dt.setDate(dt.getDate() + 1)) {
+      const dayKey = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+      allDays.push({
+        dayKey: dayKey,
+        displayDate: dt.toLocaleDateString('pt-BR', { 
           day: '2-digit', 
-          month: '2-digit', 
-          hour: '2-digit'
+          month: '2-digit',
+          year: 'numeric'
         }),
-        hourKey: hourKey,
-        data: hourlyData[hourKey] || null
+        shortDisplayDate: dt.toLocaleDateString('pt-BR', { 
+          day: '2-digit', 
+          month: '2-digit'
+        }),
+        data: dailyData[dayKey] || { count: 0, date: dayKey }
       });
     }
 
-    const labels = allHours.map(h => h.label);
-    const magnitudes = allHours.map(h => {
-      if (!h.data) return null; 
-      const avg = h.data.magnitudes.reduce((a, b) => a + b, 0) / h.data.magnitudes.length;
-      return parseFloat(avg.toFixed(4));
-    });
-
-    const validReadings = magnitudes.map((val, idx) => val !== null ? val : null);
-    const missingReadings = magnitudes.map((val, idx) => val === null ? 0 : null);
+    const labels = allDays.map(d => d.shortDisplayDate);
+    const counts = allDays.map(d => d.data.count);
+    
+    const backgroundColors = counts.map(count => 
+      count < MIN_READINGS_THRESHOLD ? 'rgba(244, 67, 54, 0.6)' : 'rgba(33, 150, 243, 0.6)'
+    );
+    const borderColors = counts.map(count => 
+      count < MIN_READINGS_THRESHOLD ? 'rgb(244, 67, 54)' : 'rgb(33, 150, 243)'
+    );
 
     chartData = {
       labels,
       datasets: [
         {
-          label: ' Média de Atividade (m/s²)',
-          data: validReadings,
-          borderColor: 'rgb(76, 175, 80)',
-          backgroundColor: 'rgba(76, 175, 80, 0.1)',
-          fill: true,
-          tension: 0.4,
-          pointRadius: 0,
-          pointHoverRadius: 8,
-          pointHoverBackgroundColor: 'rgb(76, 175, 80)',
-          pointHoverBorderColor: '#fff',
-          pointHoverBorderWidth: 3,
-          borderWidth: 2.5,
-          spanGaps: false
-        },
-        {
-          label: ' Falhas (sem leitura)',
-          data: missingReadings,
-          borderColor: 'transparent',
-          backgroundColor: 'transparent',
+          label: 'Número de Leituras por Dia',
+          data: counts,
+          backgroundColor: backgroundColors,
+          borderColor: borderColors,
+          borderWidth: 2,
+          tension: 0.1,
           pointRadius: 6,
-          pointHoverRadius: 10,
-          pointBackgroundColor: 'rgb(244, 67, 54)',
+          pointHoverRadius: 8,
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
-          pointHoverBackgroundColor: 'rgb(244, 67, 54)',
-          pointHoverBorderColor: '#fff',
-          pointHoverBorderWidth: 3,
-          showLine: false
+          fill: false
         }
       ]
     };
@@ -523,18 +524,7 @@ function Baselines() {
           labels: {
             usePointStyle: true,
             padding: 15,
-            font: { size: 13, weight: '600' },
-            generateLabels: (chart) => {
-              const datasets = chart.data.datasets;
-              return datasets.map((dataset, i) => ({
-                text: dataset.label,
-                fillStyle: dataset.pointBackgroundColor,
-                strokeStyle: dataset.borderColor !== 'transparent' ? dataset.borderColor : dataset.pointBackgroundColor,
-                lineWidth: 2,
-                hidden: !chart.isDatasetVisible(i),
-                index: i
-              }));
-            }
+            font: { size: 13, weight: '600' }
           }
         },
         tooltip: {
@@ -544,19 +534,16 @@ function Baselines() {
           bodyFont: { size: 12 },
           callbacks: {
             title: (context) => {
-              return ` ${context[0].label}`;
+              const dayData = allDays[context[0].dataIndex];
+              return dayData.displayDate;
             },
             label: (context) => {
-              if (context.datasetIndex === 0 && context.parsed.y !== null) {
-                const hourData = allHours[context.dataIndex].data;
-                return [
-                  `Média: ${context.parsed.y.toFixed(4)} m/s²`,
-                  `Leituras: ${hourData.count}`
-                ];
-              } else if (context.datasetIndex === 1) {
-                return ' Sem leituras neste período';
-              }
-              return '';
+              const count = context.parsed.y;
+              const status = count < MIN_READINGS_THRESHOLD ? 'Poucos dados' : 'Dados adequados';
+              return [
+                `Leituras: ${count}`,
+                status
+              ];
             }
           }
         }
@@ -566,33 +553,32 @@ function Baselines() {
           beginAtZero: true,
           title: {
             display: true,
-            text: 'Magnitude Média (m/s²)',
+            text: 'Número de Leituras',
             font: { size: 14, weight: 'bold' },
             color: '#333'
           },
           grid: { 
-            color: 'rgba(0, 0, 0, 0.08)',
+            color: 'rgba(0, 0, 0, 0.1)',
             drawBorder: false
           },
           ticks: {
             font: { size: 11 },
-            color: '#666'
+            color: '#666',
+            callback: function(value) {
+              return Number.isInteger(value) ? value.toLocaleString('pt-BR') : '';
+            }
           }
         },
         x: {
           title: {
             display: true,
-            text: 'Período (Dia/Mês - Hora)',
+            text: 'Dias do Período',
             font: { size: 14, weight: 'bold' },
             color: '#333'
           },
           ticks: {
-            maxRotation: 45,
-            minRotation: 45,
-            font: { size: 10 },
-            color: '#666',
-            autoSkip: true,
-            maxTicksLimit: 24
+            font: { size: 12 },
+            color: '#666'
           },
           grid: { 
             color: 'rgba(0, 0, 0, 0.05)',
@@ -602,14 +588,16 @@ function Baselines() {
       }
     };
 
-    const validMagnitudes = magnitudes.filter(m => m !== null);
-    previewData.stats = {
-      count: previewData.readings.length,
-      hours_with_data: validMagnitudes.length,
-      hours_missing: allHours.length - validMagnitudes.length,
-      avg: validMagnitudes.length > 0 ? (validMagnitudes.reduce((a, b) => a + b, 0) / validMagnitudes.length).toFixed(4) : '0',
-      min: validMagnitudes.length > 0 ? Math.min(...validMagnitudes).toFixed(4) : '0',
-      max: validMagnitudes.length > 0 ? Math.max(...validMagnitudes).toFixed(4) : '0'
+    const daysWithData = allDays.filter(d => d.data.count > 0);
+    const totalReadings = allDays.reduce((sum, d) => sum + d.data.count, 0);
+    const avgReadingsPerDay = daysWithData.length > 0 ? Math.round(totalReadings / daysWithData.length) : 0;
+    
+    previewData.dailyStats = allDays;
+    previewData.summaryStats = {
+      total_readings: totalReadings,
+      avg_readings_per_day: avgReadingsPerDay,
+      days_with_data: daysWithData.length,
+      total_days: allDays.length
     };
   }
 
@@ -641,7 +629,7 @@ function Baselines() {
                 </>
               ) : showBaselines ? (
                 <>
-                  ✕
+                  <RxCross2 />
                   Ocultar Baselines
                 </>
               ) : (
@@ -864,41 +852,100 @@ function Baselines() {
                 {previewData && (
                   <>
                     <div className="stats-card">
-                      <h3> Estatísticas do Período</h3>
-                      <div className="stats-grid">
-                        <div className="stat-item">
-                          <span className="stat-label">Total de Leituras</span>
-                          <span className="stat-value">{previewData.stats.count}</span>
+                      <h3>
+                        <BsBarChartLine style={{ marginRight: '0.5rem' }} />
+                        Estatísticas do Período
+                      </h3>
+                      
+                      <div className="daily-stats-table">
+                        <div className="table-wrapper">
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>Data</th>
+                                <th>Quantidade de Leituras</th>
+                                <th>Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {previewData.dailyStats.map((day, index) => (
+                                <tr 
+                                  key={day.dayKey}
+                                  className={day.data.count < MIN_READINGS_THRESHOLD ? 'warning-row' : ''}
+                                >
+                                  <td data-label="Data">
+                                    {day.displayDate}
+                                  </td>
+                                  <td 
+                                    data-label="Leituras"
+                                    style={{ 
+                                      color: day.data.count < MIN_READINGS_THRESHOLD ? '#f44336' : '#4caf50',
+                                      fontWeight: 'bold'
+                                    }}
+                                  >
+                                    {day.data.count.toLocaleString('pt-BR')}
+                                  </td>
+                                  <td data-label="Status">
+                                    {day.data.count === 0 ? (
+                                      <span className="status-badge no-data">
+                                        <RxCross2 style={{ marginRight: '0.25rem' }} />
+                                        Sem dados
+                                      </span>
+                                    ) : day.data.count < MIN_READINGS_THRESHOLD ? (
+                                      <span className="status-badge low-data">
+                                        <HiOutlineExclamationTriangle style={{ marginRight: '0.25rem' }} />
+                                        Poucos dados
+                                      </span>
+                                    ) : (
+                                      <span className="status-badge good-data">
+                                        <RxCheckCircled style={{ marginRight: '0.25rem' }} />
+                                        Adequado
+                                      </span>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
                         </div>
-                        <div className="stat-item">
-                          <span className="stat-label">Horas com Dados</span>
-                          <span className="stat-value">{previewData.stats.hours_with_data}</span>
-                        </div>
-                        <div className="stat-item">
-                          <span className="stat-label">Horas sem Dados</span>
-                          <span className="stat-value" style={{ color: previewData.stats.hours_missing > 0 ? '#f44336' : '#4caf50' }}>
-                            {previewData.stats.hours_missing}
-                          </span>
-                        </div>
-                        <div className="stat-item">
-                          <span className="stat-label">Média</span>
-                          <span className="stat-value">{previewData.stats.avg}</span>
-                        </div>
-                        <div className="stat-item">
-                          <span className="stat-label">Mínimo</span>
-                          <span className="stat-value">{previewData.stats.min}</span>
-                        </div>
-                        <div className="stat-item">
-                          <span className="stat-label">Máximo</span>
-                          <span className="stat-value">{previewData.stats.max}</span>
+                      </div>
+
+                      <div className="summary-stats">
+                        <div className="stats-grid">
+                          <div className="stat-item">
+                            <span className="stat-label">Total de Leituras</span>
+                            <span className="stat-value">{previewData.summaryStats.total_readings.toLocaleString('pt-BR')}</span>
+                          </div>
+                          <div className="stat-item">
+                            <span className="stat-label">Média por Dia</span>
+                            <span className="stat-value">{previewData.summaryStats.avg_readings_per_day.toLocaleString('pt-BR')}</span>
+                          </div>
+                          <div className="stat-item">
+                            <span className="stat-label">Dias com Dados</span>
+                            <span className="stat-value">
+                              {previewData.summaryStats.days_with_data} / {previewData.summaryStats.total_days}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
 
                     <div className="chart-card">
                       <div className="chart-header">
-                        <h3> Gráfico de Atividade - Período de Referência</h3>
-                        <p>Média horária de atividade com indicação de períodos com e sem leituras</p>
+                        <h3>
+                          <GoGraph style={{ marginRight: '0.5rem' }} />
+                          Leituras por Dia - Período de Referência
+                        </h3>
+                        <p>
+                          <span style={{ color: '#1565c0', display: 'inline-flex', alignItems: 'center' }}>
+                            <RxCheckCircled style={{ marginRight: '0.25rem' }} />
+                            Dados adequados (≥{MIN_READINGS_THRESHOLD})
+                          </span> • 
+                          <span style={{ color: '#1565c0', marginLeft: '1rem', display: 'inline-flex', alignItems: 'center' }}>
+                            <HiOutlineExclamationTriangle style={{ marginRight: '0.25rem' }} />
+                            Poucos dados (&lt;{MIN_READINGS_THRESHOLD})
+                          </span>
+                        </p>
                       </div>
                       <div className="chart-wrapper">
                         <Line data={chartData} options={chartOptions} />

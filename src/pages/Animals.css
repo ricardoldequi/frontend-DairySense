@@ -61,6 +61,8 @@
   border-left: 4px solid #e74c3c;
   border-radius: 8px;
   animation: slideDown 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .page-actions .banner.success {
@@ -70,6 +72,8 @@
   border-left: 4px solid #28a745;
   border-radius: 8px;
   animation: slideDown 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .banner.error {
@@ -80,6 +84,8 @@
   border-radius: 8px;
   margin-bottom: 1rem;
   animation: slideDown 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .banner.success {
@@ -90,6 +96,8 @@
   border-radius: 8px;
   margin-bottom: 1rem;
   animation: slideDown 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 @keyframes slideDown {
@@ -398,7 +406,6 @@
     grid-template-columns: 1fr; 
   }
   
-  /* empilha banner acima do botao (mobile) */
   .page-actions {
     flex-direction: column;
     align-items: stretch;
